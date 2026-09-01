@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chicken Market — Buy and Sell Poultry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#1F3D2B;
+    --forest-dark:#142819;
+    --amber:#D98E04;
+    --amber-dark:#B57203;
+    --clay:#B45309;
+    --cream:#FBF6EC;
+    --sage:#EDF1E1;
+    --charcoal:#2A2620;
+    --line:#C9BFA5;
+    --white:#FFFFFF;
+    --error:#A32020;
+    --ok:#2E6B3E;
+    --radius: 10px;
+    --focus: 3px solid #0B5FFF;
+  }
+
+  html{ font-size: 100%; scroll-behavior: smooth; }
+  html.text-large{ font-size: 118%; }
+  html.text-xlarge{ font-size: 134%; }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--cream);
+    color: var(--charcoal);
+    font-family: 'Work Sans', -apple-system, sans-serif;
+    line-height: 1.5;
+  }
+
+  h1,h2,h3,.display{
+    font-family: 'Zilla Slab', Georgia, serif;
+    color: var(--forest-dark);
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  a{ color: inherit; }
+
+  img{ max-width:100%; display:block; }
+
+  button{ font-family: inherit; cursor: pointer; }
+
+  :focus-visible{ outline: var(--focus); outline-offset: 2px; }
+
+  .container{ max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+  /* ---------- Header ---------- */
+  header.site{
+    background: var(--forest);
+    color: var(--cream);
+    position: sticky;
+    top:0;
+    z-index: 50;
+    border-bottom: 4px solid var(--amber);
+  }
+  .header-inner{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    max-width: 1080px;
+    margin: 0 auto;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .wordmark{
+    font-family:'Zilla Slab', serif;
+    font-weight:700;
+    font-size: 1.5rem;
+    color: var(--white);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    white-space: nowrap;
+  }
+  .wordmark .dot{ color: var(--amber); }
+
+  nav.site{
+    display:flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  nav.site button{
+    background: transparent;
+    border: 2px solid transparent;
+    color: var(--cream);
+    font-size: 1rem;
+    font-weight:600;
+    padding: 10px 14px;
+    border-radius: var(--radius);
+  }
+  nav.site button:hover{ border-color: rgba(255,255,255,0.35); }
+  nav.site button.active{ background: var(--amber); color: var(--forest-dark); }
+
+  .text-controls{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: var(--radius);
+    padding: 4px;
+  }
+  .text-controls span{ font-size:.8rem; padding-left:6px; color: var(--cream); }
+  .text-controls button{
+    background: transparent;
+    border:none;
+    color: var(--cream);
+    width: 34px; height: 34px;
+    border-radius: 6px;
+    font-weight:700;
+  }
+  .text-controls button:hover, .text-controls button.on{ background: var(--amber); color: var(--forest-dark); }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background: var(--forest-dark);
+    color: var(--cream);
+    padding: 56px 0 40px;
+  }
+  .hero h1{
+    color: var(--white);
+    font-size: clamp(2rem, 5vw, 3.1rem);
+    max-width: 14ch;
+    font-weight: 700;
+  }
+  .hero p.lede{
+    max-width: 52ch;
+    font-size: 1.15rem;
+    margin-top: 16px;
+    color: #DCE6D8;
+  }
+  .hero-actions{
+    display:flex;
+    gap: 14px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding: 14px 22px;
+    border-radius: var(--radius);
+    border: 2px solid transparent;
+    min-height: 48px;
+  }
+  .btn-primary{ background: var(--amber); color: var(--forest-dark); }
+  .btn-primary:hover{ background: var(--amber-dark); }
+  .btn-outline{ background: transparent; border-color: var(--cream); color: var(--cream); }
+  .btn-outline:hover{ background: rgba(255,255,255,0.1); }
+  .btn-call{ background: var(--forest); color: var(--white); }
+  .btn-call:hover{ background: var(--forest-dark); }
+  .btn-whatsapp{ background: #2E7D4F; color: var(--white); }
+  .btn-whatsapp:hover{ background: #256540; }
+  .btn-block{ width:100%; justify-content:center; }
+
+  .ledger-strip{
+    margin-top: 34px;
+    border-top: 1px solid rgba(255,255,255,0.25);
+    padding-top: 18px;
+    display:flex;
+    gap: 30px;
+    flex-wrap: wrap;
+    font-family:'Zilla Slab', serif;
+  }
+  .ledger-strip .stat b{ font-size: 1.6rem; color: var(--amber); display:block; }
+  .ledger-strip .stat span{ font-family:'Work Sans',sans-serif; font-size:.85rem; color:#C7D2C2; }
+
+  /* ---------- Sections ---------- */
+  section{ padding: 48px 0; }
+  section.alt{ background: var(--sage); }
+  .section-head{ margin-bottom: 24px; }
+  .section-head h2{ font-size: 2rem; }
+  .section-head p{ margin-top:8px; color:#4B463C; max-width: 60ch; }
+
+  /* ---------- Filter bar ---------- */
+  .filter-bar{
+    display:flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 28px;
+  }
+  .field{ display:flex; flex-direction:column; gap:6px; flex:1; min-width: 160px; }
+  .field label{ font-size:.85rem; font-weight:600; color: var(--forest-dark); }
+  select, input[type=text], input[type=tel], input[type=number], textarea{
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 12px 12px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--charcoal);
+    min-height: 46px;
+  }
+  select:focus, input:focus, textarea:focus{ border-color: var(--forest); }
+  textarea{ resize: vertical; min-height: 90px; }
+
+  /* ---------- Listings (ledger rows, not cards) ---------- */
+  .listings{ border-top: 3px solid var(--forest); }
+  .listing-row{
+    display:grid;
+    grid-template-columns: 96px 1fr auto;
+    gap: 18px;
+    align-items:center;
+    padding: 18px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .listing-row:nth-child(even){ background: rgba(237,241,225,0.55); }
+  .listing-thumb{
+    width: 96px; height: 96px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--sage);
+    border: 1px solid var(--line);
+  }
+  .listing-thumb.placeholder{
+    display:flex; align-items:center; justify-content:center;
+    font-size: 2rem;
+  }
+  .listing-main h3{ font-size: 1.25rem; }
+  .listing-meta{
+    display:flex; gap: 14px; flex-wrap:wrap;
+    margin-top: 6px;
+    font-size: .92rem;
+    color: #4B463C;
+  }
+  .listing-meta b{ color: var(--forest-dark); }
+  .listing-desc{ margin-top:8px; font-size:.95rem; color:#4B463C; max-width: 60ch; }
+  .listing-price{
+    font-family:'Zilla Slab',serif;
+    font-weight:700;
+    font-size: 1.3rem;
+    color: var(--clay);
+    white-space: nowrap;
+  }
+  .listing-actions{
+    display:flex; flex-direction:column; gap:8px; align-items:stretch;
+  }
+  .listing-actions .btn{ font-size:.95rem; padding: 10px 16px; min-height:42px; white-space:nowrap; }
+
+  .empty-state{
+    text-align:center;
+    padding: 60px 20px;
+    color: #4B463C;
+  }
+  .empty-state .display{ font-size:1.4rem; margin-bottom:8px; }
+
+  /* ---------- Sell wizard ---------- */
+  .wizard{
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+  .wizard-progress{
+    display:flex;
+    justify-content: space-between;
+    margin-bottom: 26px;
+    gap: 6px;
+  }
+  .wizard-step-dot{
+    flex:1;
+    text-align:center;
+    font-size:.78rem;
+    font-weight:600;
+    color: #A69C82;
+    position:relative;
+    padding-top: 26px;
+  }
+  .wizard-step-dot::before{
+    content: attr(data-n);
+    position:absolute; top:0; left:50%; transform: translateX(-50%);
+    width: 26px; height:26px; border-radius:50%;
+    background: var(--sage); color:#A69C82;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Zilla Slab',serif;
+    border: 2px solid var(--line);
+  }
+  .wizard-step-dot.done::before{ background: var(--forest); color:var(--white); border-color:var(--forest); content: "✓"; }
+  .wizard-step-dot.current{ color: var(--forest-dark); }
+  .wizard-step-dot.current::before{ border-color: var(--amber); background: var(--amber); color:var(--forest-dark); }
+
+  .wizard-step{ display:none; }
+  .wizard-step.active{ display:block; animation: fadein .25s ease; }
+  @keyframes fadein{ from{opacity:0; transform: translateY(6px);} to{opacity:1; transform:none;} }
+
+  .wizard-step h3{ font-size:1.3rem; margin-bottom:4px; }
+  .wizard-step .hint{ color:#6B6553; font-size:.9rem; margin-bottom:16px; }
+
+  .wizard-nav{ display:flex; justify-content: space-between; margin-top: 24px; gap:10px; }
+  .btn-ghost{ background: transparent; border: 2px solid var(--line); color: var(--forest-dark); font-weight:700; padding: 12px 20px; border-radius: var(--radius); min-height:46px; }
+  .btn-ghost:hover{ border-color: var(--forest); }
+
+  .error-text{ color: var(--error); font-size:.85rem; margin-top:6px; display:none; }
+  .error-text.show{ display:block; }
+  .field.invalid input, .field.invalid textarea{ border-color: var(--error); }
+
+  .photo-drop{
+    border: 2px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align:center;
+    cursor:pointer;
+    background: var(--sage);
+  }
+  .photo-drop:hover{ border-color: var(--forest); }
+  .photo-preview{ margin-top:12px; max-width: 180px; border-radius:8px; border:1px solid var(--line); }
+
+  .success-box{
+    text-align:center;
+    padding: 30px 10px;
+  }
+  .success-box .checkmark{
+    width:60px; height:60px; border-radius:50%;
+    background: var(--ok); color:var(--white);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; margin: 0 auto 16px;
+  }
+
+  /* ---------- About / trust section ---------- */
+  .trust-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+    gap: 22px;
+    margin-top: 10px;
+  }
+  .trust-item{ border-left: 4px solid var(--amber); padding-left: 16px; }
+  .trust-item h3{ font-size:1.1rem; }
+  .trust-item p{ font-size:.92rem; color:#4B463C; margin-top:6px; }
+
+  footer.site{
+    background: var(--forest-dark);
+    color: #C7D2C2;
+    padding: 30px 0;
+    font-size:.9rem;
+  }
+  footer.site .container{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; }
+  footer.site a{ color: var(--amber); text-decoration:none; }
+
+  .visually-hidden{
+    position:absolute; width:1px; height:1px; overflow:hidden;
+    clip: rect(0,0,0,0); white-space:nowrap;
+  }
+
+  .badge-count{
+    display:inline-block;
+    background: var(--forest);
+    color: var(--white);
+    font-size:.75rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 6px;
+  }
+
+  @media (max-width: 640px){
+    .listing-row{ grid-template-columns: 72px 1fr; }
+    .listing-actions{ grid-column: 1 / -1; flex-direction: row; margin-top: 10px; }
+    .listing-actions .btn{ flex:1; }
+    .listing-price{ grid-column: 2; }
+    .header-inner{ flex-direction: column; align-items: stretch; }
+    nav.site{ justify-content: space-between; }
+    nav.site button{ flex:1; text-align:center; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.001ms !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="header-inner">
+    <div class="wordmark">Chicken<span class="dot">•</span>Market</div>
+    <nav class="site" aria-label="Main navigation">
+      <button data-nav="home" class="active">Home</button>
+      <button data-nav="browse">Browse Sellers</button>
+      <button data-nav="sell">Sell Poultry</button>
+    </nav>
+    <div class="text-controls" role="group" aria-label="Text size">
+      <span>Text size</span>
+      <button id="text-normal" class="on" aria-pressed="true" title="Normal text">A</button>
+      <button id="text-large" aria-pressed="false" title="Large text">A</button>
+      <button id="text-xlarge" aria-pressed="false" title="Extra large text">A</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- HOME / HERO -->
+  <section id="page-home">
+    <div class="hero">
+      <div class="container">
+        <h1>Buy and sell poultry, straight from farm to buyer.</h1>
+        <p class="lede">Chicken Market connects poultry sellers and buyers across Uganda. List your stock in minutes, or call a nearby seller today — no account needed to browse.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" data-nav="browse">Browse Sellers</button>
+          <button class="btn btn-outline" data-nav="sell">List Your Stock</button>
+        </div>
+        <div class="ledger-strip">
+          <div class="stat"><b id="stat-sellers">0</b><span>Active sellers</span></div>
+          <div class="stat"><b id="stat-locations">0</b><span>Locations covered</span></div>
+          <div class="stat"><b id="stat-types">6</b><span>Types of poultry</span></div>
+        </div>
+      </div>
+    </div>
+
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2>How it works</h2>
+          <p>Simple enough for anyone to use — no technical experience needed.</p>
+        </div>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <h3>1. Sellers list their stock</h3>
+            <p>Enter your name, phone number, location, and what you have for sale — broilers, layers, hens, chicks or eggs.</p>
+          </div>
+          <div class="trust-item">
+            <h3>2. Buyers browse freely</h3>
+            <p>Anyone can search and filter listings by location, type, and price — no sign-up or login required.</p>
+          </div>
+          <div class="trust-item">
+            <h3>3. Contact is instant</h3>
+            <p>Buyers tap Call or WhatsApp to reach a seller directly. No middleman, no waiting.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- BROWSE -->
+  <section id="page-browse" class="alt" hidden>
+    <div class="container">
+      <div class="section-head">
+        <h2>Browse Sellers <span class="badge-count" id="results-count">0</span></h2>
+        <p>Every listing shows the seller's contact details directly — reach out by phone or WhatsApp.</p>
+      </div>
+
+      <form class="filter-bar" id="filter-form" role="search" aria-label="Filter listings">
+        <div class="field">
+          <label for="f-search">Search</label>
+          <input type="text" id="f-search" placeholder="Search seller, location...">
+        </div>
+        <div class="field">
+          <label for="f-type">Poultry type</label>
+          <select id="f-type">
+            <option value="">All types</option>
+            <option value="Broilers">Broilers</option>
+            <option value="Layers">Layers</option>
+            <option value="Hens">Hens</option>
+            <option value="Chicks">Chicks</option>
+            <option value="Eggs">Eggs</option>
+            <option value="Cocks">Cocks</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="f-location">Location</label>
+          <input type="text" id="f-location" placeholder="e.g. Mukono">
+        </div>
+        <div class="field">
+          <label for="f-price">Max price (UGX)</label>
+          <input type="number" id="f-price" placeholder="e.g. 30000" min="0">
+        </div>
+      </form>
+
+      <div class="listings" id="listings-container" aria-live="polite">
+        <!-- listing rows injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SELL WIZARD -->
+  <section id="page-sell" hidden>
+    <div class="container">
+      <div class="section-head">
+        <h2>List Your Poultry Stock</h2>
+        <p>Fill in one step at a time. It takes about two minutes, and buyers will see your number right away.</p>
+      </div>
+
+      <div class="wizard">
+        <div class="wizard-progress" id="wizard-progress"></div>
+
+        <form id="sell-form" novalidate>
+          <div class="wizard-step active" data-step="1">
+            <h3>Your name</h3>
+            <p class="hint">This is how buyers will know who they're contacting.</p>
+            <div class="field">
+              <label for="s-name">Full name</label>
+              <input type="text" id="s-name" autocomplete="name" required>
+              <div class="error-text" id="err-name">Please enter your name.</div>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="2">
+            <h3>Your phone number</h3>
+            <p class="hint">Buyers will call or WhatsApp you on this number. Use a number you check often.</p>
+            <div class="field">
+              <label for="s-phone">Phone number</label>
+              <input type="tel" id="s-phone" placeholder="07XXXXXXXX or +2567XXXXXXXX" autocomplete="tel" required>
+              <div class="error-text" id="err-phone">Enter a valid Ugandan phone number (e.g. 0771234567).</div>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="3">
+            <h3>Your location</h3>
+            <p class="hint">District or town where buyers can reach you or collect stock.</p>
+            <div class="field">
+              <label for="s-location">Location</label>
+              <input type="text" id="s-location" placeholder="e.g. Wakiso, Mukono, Mbarara" required>
+              <div class="error-text" id="err-location">Please enter your location.</div>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="4">
+            <h3>What are you selling?</h3>
+            <p class="hint">Choose the type of poultry stock you have available.</p>
+            <div class="field">
+              <label for="s-type">Poultry type</label>
+              <select id="s-type" required>
+                <option value="">Select type</option>
+                <option value="Broilers">Broilers</option>
+                <option value="Layers">Layers</option>
+                <option value="Hens">Hens</option>
+                <option value="Chicks">Chicks</option>
+                <option value="Eggs">Eggs</option>
+                <option value="Cocks">Cocks</option>
+              </select>
+              <div class="error-text" id="err-type">Please select a poultry type.</div>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="5">
+            <h3>Quantity and price</h3>
+            <p class="hint">How many do you have, and what's the price per bird or unit?</p>
+            <div class="field" style="margin-bottom:16px;">
+              <label for="s-qty">Quantity available</label>
+              <input type="number" id="s-qty" min="1" placeholder="e.g. 50" required>
+              <div class="error-text" id="err-qty">Enter how many are available.</div>
+            </div>
+            <div class="field">
+              <label for="s-price">Price per unit (UGX)</label>
+              <input type="number" id="s-price" min="0" placeholder="e.g. 25000" required>
+              <div class="error-text" id="err-price">Enter a price.</div>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="6">
+            <h3>Add a photo (optional)</h3>
+            <p class="hint">A clear photo of your stock helps buyers trust your listing.</p>
+            <label class="photo-drop" for="s-photo">
+              📷 Tap to upload a photo
+              <input type="file" id="s-photo" accept="image/*" class="visually-hidden">
+            </label>
+            <img id="photo-preview" class="photo-preview" hidden alt="">
+          </div>
+
+          <div class="wizard-step" data-step="7">
+            <h3>Short description</h3>
+            <p class="hint">Anything buyers should know — age of birds, breed, vaccination, delivery options.</p>
+            <div class="field">
+              <label for="s-desc">Description</label>
+              <textarea id="s-desc" placeholder="e.g. 6-week-old broilers, vaccinated, ready for collection"></textarea>
+            </div>
+          </div>
+
+          <div class="wizard-step" data-step="8">
+            <div class="success-box">
+              <div class="checkmark">✓</div>
+              <h3>Ready to publish</h3>
+              <p class="hint">Review your details below, then publish your listing so buyers can see it.</p>
+              <div id="review-summary" style="text-align:left; background:var(--sage); border-radius:8px; padding:16px; font-size:.95rem;"></div>
+            </div>
+          </div>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn-ghost" id="wizard-back">Back</button>
+            <button type="button" class="btn btn-primary" id="wizard-next">Continue</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="container">
+    <div>Chicken Market — connecting poultry sellers and buyers across Uganda.</div>
+    <div>Listings are public and visible to all visitors.</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- Navigation ---------------- */
+  const pages = { home: 'page-home', browse: 'page-browse', sell: 'page-sell' };
+  function showPage(name){
+    Object.values(pages).forEach(id => document.getElementById(id).hidden = true);
+    document.getElementById(pages[name]).hidden = false;
+    document.querySelectorAll('nav.site button').forEach(b => b.classList.toggle('active', b.dataset.nav === name));
+    window.scrollTo({top:0, behavior:'smooth'});
+    if(name === 'browse'){ renderListings(); }
+    if(name === 'sell'){ resetWizard(); }
+  }
+  document.querySelectorAll('[data-nav]').forEach(el => {
+    el.addEventListener('click', () => showPage(el.dataset.nav));
+  });
+
+  /* ---------------- Text size controls ---------------- */
+  const sizeButtons = { normal:'text-normal', large:'text-large', xlarge:'text-xlarge' };
+  function setTextSize(size){
+    document.documentElement.classList.remove('text-large','text-xlarge');
+    if(size !== 'normal') document.documentElement.classList.add('text-' + size);
+    Object.entries(sizeButtons).forEach(([key,id]) => {
+      const btn = document.getElementById(id);
+      btn.classList.toggle('on', key === size);
+      btn.setAttribute('aria-pressed', key === size ? 'true':'false');
+    });
+  }
+  document.getElementById('text-normal').addEventListener('click', () => setTextSize('normal'));
+  document.getElementById('text-large').addEventListener('click', () => setTextSize('large'));
+  document.getElementById('text-xlarge').addEventListener('click', () => setTextSize('xlarge'));
+
+  /* ---------------- Utilities: sanitization & validation ---------------- */
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function cleanText(str, maxLen){
+    if(!str) return '';
+    let out = String(str).trim().slice(0, maxLen || 200);
+    return out;
+  }
+
+  function normalizePhone(raw){
+    let digits = String(raw || '').replace(/[^\d+]/g, '');
+    if(digits.startsWith('+256')) return digits;
+    if(digits.startsWith('256')) return '+' + digits;
+    if(digits.startsWith('0') && digits.length === 10) return '+256' + digits.slice(1);
+    return null; // invalid
+  }
+
+  function isValidPhone(raw){
+    return normalizePhone(raw) !== null;
+  }
+
+  /* ---------------- Storage (shared, so buyers see all listings) ---------------- */
+  const LISTINGS_KEY = 'poultry_listings_v1';
+
+  async function loadListings(){
+    try{
+      const res = await window.storage.get(LISTINGS_KEY, true);
+      if(res && res.value){ return JSON.parse(res.value); }
+      return [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  async function saveListings(list){
+    try{
+      await window.storage.set(LISTINGS_KEY, JSON.stringify(list), true);
+      return true;
+    }catch(e){
+      console.error('Could not save listing', e);
+      return false;
+    }
+  }
+
+  /* ---------------- Rate limiting (simple client-side throttle) ---------------- */
+  function canSubmit(){
+    const last = Number(localStorage.getItem('lastListingSubmit') || 0);
+    const now = Date.now();
+    if(now - last < 30000){ // 30 seconds between submissions
+      return false;
+    }
+    return true;
+  }
+  function markSubmitted(){
+    localStorage.setItem('lastListingSubmit', String(Date.now()));
+  }
+
+  /* ---------------- Rendering listings ---------------- */
+  let allListings = [];
+
+  function typeEmoji(type){
+    return { Broilers:'🍗', Layers:'🐔', Hens:'🐓', Chicks:'🐥', Eggs:'🥚', Cocks:'🐓' }[type] || '🐔';
+  }
+
+  function waLink(phoneIntl, sellerName, poultryType){
+    const num = phoneIntl.replace('+','');
+    const msg = encodeURIComponent(`Hi ${sellerName}, I saw your ${poultryType} listing on Chicken Market and I'm interested.`);
+    return `https://wa.me/${num}?text=${msg}`;
+  }
+
+  function renderListings(){
+    const search = cleanText(document.getElementById('f-search').value, 60).toLowerCase();
+    const type = document.getElementById('f-type').value;
+    const loc = cleanText(document.getElementById('f-location').value, 60).toLowerCase();
+    const maxPrice = Number(document.getElementById('f-price').value) || Infinity;
+
+    const filtered = allListings.filter(item => {
+      if(type && item.type !== type) return false;
+      if(loc && !item.location.toLowerCase().includes(loc)) return false;
+      if(item.price > maxPrice) return false;
+      if(search){
+        const hay = (item.name + ' ' + item.location + ' ' + item.type + ' ' + item.description).toLowerCase();
+        if(!hay.includes(search)) return false;
+      }
+      return true;
+    }).sort((a,b) => b.createdAt - a.createdAt);
+
+    const container = document.getElementById('listings-container');
+    document.getElementById('results-count').textContent = filtered.length;
+
+    if(filtered.length === 0){
+      container.innerHTML = `<div class="empty-state">
+        <div class="display">No listings match yet</div>
+        <p>Try clearing filters, or be the first to list stock in this area.</p>
+      </div>`;
+      return;
+    }
+
+    container.innerHTML = filtered.map(item => {
+      const phoneIntl = item.phoneIntl;
+      const telHref = `tel:${phoneIntl}`;
+      const waHref = waLink(phoneIntl, item.name, item.type);
+      const photo = item.photo
+        ? `<img class="listing-thumb" src="${item.photo}" alt="${escapeHtml(item.photoAlt || (item.type + ' stock photo from ' + item.name))}">`
+        : `<div class="listing-thumb placeholder" role="img" aria-label="No photo provided">${typeEmoji(item.type)}</div>`;
+
+      return `
+      <div class="listing-row">
+        ${photo}
+        <div class="listing-main">
+          <h3>${escapeHtml(item.name)} — ${escapeHtml(item.type)}</h3>
+          <div class="listing-meta">
+            <span>📍 <b>${escapeHtml(item.location)}</b></span>
+            <span>📦 <b>${escapeHtml(String(item.quantity))}</b> available</span>
+          </div>
+          ${item.description ? `<div class="listing-desc">${escapeHtml(item.description)}</div>` : ''}
+        </div>
+        <div>
+          <div class="listing-price">UGX ${Number(item.price).toLocaleString()}</div>
+          <div class="listing-actions" style="margin-top:10px;">
+            <a class="btn btn-call" href="${telHref}" aria-label="Call ${escapeHtml(item.name)}">📞 Call</a>
+            <a class="btn btn-whatsapp" href="${waHref}" target="_blank" rel="noopener" aria-label="WhatsApp ${escapeHtml(item.name)}">💬 WhatsApp</a>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('filter-form').addEventListener('input', renderListings);
+  document.getElementById('filter-form').addEventListener('submit', e => e.preventDefault());
+
+  async function refreshStats(){
+    const sellers = new Set(allListings.map(l => l.phoneIntl));
+    const locations = new Set(allListings.map(l => l.location.toLowerCase()));
+    document.getElementById('stat-sellers').textContent = sellers.size;
+    document.getElementById('stat-locations').textContent = locations.size;
+  }
+
+  /* ---------------- Sell wizard ---------------- */
+  const stepNames = ['Name','Phone','Location','Type','Price','Photo','Details','Review'];
+  const totalSteps = stepNames.length;
+  let currentStep = 1;
+  let uploadedPhoto = null; // { dataUrl, alt }
+
+  function buildProgress(){
+    const el = document.getElementById('wizard-progress');
+    el.innerHTML = stepNames.map((name,i) => {
+      const n = i+1;
+      let cls = '';
+      if(n < currentStep) cls = 'done';
+      else if(n === currentStep) cls = 'current';
+      return `<div class="wizard-step-dot ${cls}" data-n="${n}">${name}</div>`;
+    }).join('');
+  }
+
+  function showStep(n){
+    document.querySelectorAll('.wizard-step').forEach(s => {
+      s.classList.toggle('active', Number(s.dataset.step) === n);
+    });
+    buildProgress();
+    document.getElementById('wizard-back').style.visibility = n === 1 ? 'hidden' : 'visible';
+    const nextBtn = document.getElementById('wizard-next');
+    nextBtn.textContent = n === totalSteps ? 'Publish Listing' : 'Continue';
+    if(n === totalSteps){ buildReview(); }
+  }
+
+  function fieldError(inputId, errId, show){
+    document.getElementById(inputId).closest('.field')?.classList.toggle('invalid', show);
+    const err = document.getElementById(errId);
+    if(err) err.classList.toggle('show', show);
+  }
+
+  function validateStep(n){
+    if(n === 1){
+      const v = cleanText(document.getElementById('s-name').value, 60);
+      const ok = v.length >= 2;
+      fieldError('s-name','err-name', !ok);
+      return ok;
+    }
+    if(n === 2){
+      const ok = isValidPhone(document.getElementById('s-phone').value);
+      fieldError('s-phone','err-phone', !ok);
+      return ok;
+    }
+    if(n === 3){
+      const v = cleanText(document.getElementById('s-location').value, 60);
+      const ok = v.length >= 2;
+      fieldError('s-location','err-location', !ok);
+      return ok;
+    }
+    if(n === 4){
+      const ok = document.getElementById('s-type').value !== '';
+      fieldError('s-type','err-type', !ok);
+      return ok;
+    }
+    if(n === 5){
+      const qty = Number(document.getElementById('s-qty').value);
+      const price = document.getElementById('s-price').value;
+      const okQty = qty > 0;
+      const okPrice = price !== '' && Number(price) >= 0;
+      fieldError('s-qty','err-qty', !okQty);
+      fieldError('s-price','err-price', !okPrice);
+      return okQty && okPrice;
+    }
+    return true; // steps 6,7,8 have no hard validation
+  }
+
+  function buildReview(){
+    const name = cleanText(document.getElementById('s-name').value, 60);
+    const phone = normalizePhone(document.getElementById('s-phone').value);
+    const location = cleanText(document.getElementById('s-location').value, 60);
+    const type = document.getElementById('s-type').value;
+    const qty = document.getElementById('s-qty').value;
+    const price = document.getElementById('s-price').value;
+    const desc = cleanText(document.getElementById('s-desc').value, 300);
+
+    document.getElementById('review-summary').innerHTML = `
+      <div><b>${escapeHtml(name)}</b> · ${escapeHtml(phone || '')}</div>
+      <div>📍 ${escapeHtml(location)}</div>
+      <div>${typeEmoji(type)} ${escapeHtml(type)} — ${escapeHtml(qty)} available at UGX ${Number(price||0).toLocaleString()} each</div>
+      ${desc ? `<div style="margin-top:8px;">${escapeHtml(desc)}</div>` : ''}
+    `;
+  }
+
+  function resetWizard(){
+    currentStep = 1;
+    document.getElementById('sell-form').reset();
+    uploadedPhoto = null;
+    document.getElementById('photo-preview').hidden = true;
+    document.querySelectorAll('.error-text').forEach(e => e.classList.remove('show'));
+    document.querySelectorAll('.field').forEach(f => f.classList.remove('invalid'));
+    showStep(1);
+  }
+
+  document.getElementById('wizard-back').addEventListener('click', () => {
+    if(currentStep > 1){ currentStep--; showStep(currentStep); }
+  });
+
+  document.getElementById('wizard-next').addEventListener('click', async () => {
+    if(!validateStep(currentStep)) return;
+
+    if(currentStep < totalSteps){
+      currentStep++;
+      showStep(currentStep);
+      return;
+    }
+
+    // Final step: publish
+    if(!canSubmit()){
+      alert('Please wait a moment before submitting another listing.');
+      return;
+    }
+
+    const btn = document.getElementById('wizard-next');
+    btn.disabled = true;
+    btn.textContent = 'Publishing...';
+
+    const phoneIntl = normalizePhone(document.getElementById('s-phone').value);
+    const listing = {
+      id: 'l_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+      name: cleanText(document.getElementById('s-name').value, 60),
+      phoneIntl,
+      location: cleanText(document.getElementById('s-location').value, 60),
+      type: document.getElementById('s-type').value,
+      quantity: Math.max(1, Math.floor(Number(document.getElementById('s-qty').value))),
+      price: Math.max(0, Number(document.getElementById('s-price').value)),
+      description: cleanText(document.getElementById('s-desc').value, 300),
+      photo: uploadedPhoto ? uploadedPhoto.dataUrl : null,
+      photoAlt: uploadedPhoto ? uploadedPhoto.alt : '',
+      createdAt: Date.now()
+    };
+
+    allListings.push(listing);
+    const saved = await saveListings(allListings);
+    btn.disabled = false;
+
+    if(saved){
+      markSubmitted();
+      refreshStats();
+      showPage('browse');
+      alert('Your listing is live! Buyers can now see and contact you.');
+    } else {
+      allListings.pop();
+      alert('Something went wrong saving your listing. Please try again.');
+      btn.textContent = 'Publish Listing';
+    }
+  });
+
+  /* ---------------- Photo upload (resized client-side) ---------------- */
+  document.getElementById('s-photo').addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    if(!file.type.startsWith('image/')){ alert('Please choose an image file.'); return; }
+
+    const reader = new FileReader();
+    reader.onload = function(evt){
+      const img = new Image();
+      img.onload = function(){
+        const maxDim = 480;
+        let { width, height } = img;
+        if(width > height && width > maxDim){ height *= maxDim/width; width = maxDim; }
+        else if(height > maxDim){ width *= maxDim/height; height = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        uploadedPhoto = { dataUrl, alt: '' };
+        const preview = document.getElementById('photo-preview');
+        preview.src = dataUrl;
+        preview.hidden = false;
+      };
+      img.src = evt.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Keep alt text in sync with description once typed
+  document.getElementById('s-desc').addEventListener('input', function(){
+    if(uploadedPhoto){ uploadedPhoto.alt = cleanText(this.value, 120); }
+  });
+
+  /* ---------------- Init ---------------- */
+  async function init(){
+    allListings = await loadListings();
+    refreshStats();
+    showStep(1);
+  }
+  init();
+
+})();
+</script>
+</body>
+</html>
